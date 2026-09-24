@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  bikes     Bike[]
+}
+
+model Bike {
+  id        String   @id @default(cuid())
+  name      String
+  components Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Component {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  brand     String
+  specs     Json
+  price     Float?
+  offers    Offer[]
+}
+
+model Offer {
+  id          String    @id @default(cuid())
+  seller      String
+  price       Float
+  shipping    Float
+  available   Boolean   @default(true)
+  url         String
+  componentId String
+  component   Component @relation(fields: [componentId], references: [id])
+  checkedAt   DateTime  @default(now())
+}
+
+model CompatibilityRule {
+  id         String @id @default(cuid())
+  name       String
+  categoryA  String
+  categoryB  String
+  rule       Json
+}
